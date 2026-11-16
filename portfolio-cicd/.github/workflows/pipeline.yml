@@ -1,0 +1,145 @@
+
+name: Pipeline CI-CD
+
+on:
+  pull_request:
+    branches:
+      - main
+
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+
+  qualidade:
+    name: Validar (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [18, 20]
+
+    steps:
+
+      - name: Baixar codigo
+        uses: actions/checkout@v4
+
+      - name: Verificar index.html
+        run: |
+          if [ ! -f "index.html" ]; then
+            echo "ERRO: index.html nao encontrado na raiz."
+            exit 1
+          fi
+
+          echo "index.html encontrado."
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Executar Linter HTML
+        run: npm run lint
+
+      - name: Verificar arquivos acima de 500KB
+        run: |
+          arquivos=$(find . -type f \
+            -not -path './.git/*' \
+            -size +500k -print)
+
+          if [ -n "$arquivos" ]; then
+            echo "ERRO: arquivos maiores que 500KB:"
+            echo "$arquivos"
+            exit 1
+          fi
+
+          echo "Tamanho dos arquivos aprovado."
+
+      - name: Procurar termos proibidos
+        run: |
+          if grep -RniE 'TODO|FIXME|senha|password' \
+            --include='*.html' \
+            --include='*.css' \
+            --include='*.js' \
+            --exclude='validate-links.mjs' .; then
+
+            echo "ERRO: termo proibido encontrado."
+            exit 1
+          fi
+
+          echo "Varredura aprovada."
+
+      - name: Validar links e imagens
+        run: npm run validate:links
+
+
+  publicar:
+    name: Publicar no GitHub Pages
+
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    needs: qualidade
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+
+      - name: Baixar codigo aprovado
+        uses: actions/checkout@v4
+
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+
+      - name: Preparar arquivos do site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Publicar site
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+
+  notificar-falha:
+    name: Notificar falha no deploy
+
+    if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.publicar.result == 'failure'
+
+    needs:
+      - qualidade
+      - publicar
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Enviar notificacao Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+
+        run: |
+          if [ -z "$DISCORD_WEBHOOK" ]; then
+            echo "Webhook nao configurado."
+            exit 0
+          fi
+
+          curl --fail \
+            -H "Content-Type: application/json" \
+            -d '{"content":"A pipeline de deploy falhou. Verifique a aba Actions."}' \
+            "$DISCORD_WEBHOOK"

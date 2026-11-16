@@ -1,0 +1,211 @@
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
+
+:root {
+    --principal: #0a6c73;
+    --escuro: #12343b;
+    --texto: #53666b;
+    --fundo: #f3f8f7;
+    --branco: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    color: var(--escuro);
+    background: var(--branco);
+    font-family: "DM Sans", sans-serif;
+    line-height: 1.6;
+}
+
+a {
+    color: inherit;
+}
+
+.container {
+    width: min(1100px, 90%);
+    margin: 0 auto;
+}
+
+.topo {
+    background: var(--branco);
+    border-bottom: 1px solid #e7eeee;
+}
+
+.navegacao {
+    min-height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.logo {
+    color: var(--escuro);
+    font-family: Manrope, sans-serif;
+    font-size: 1.25rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.logo span,
+h1 span {
+    color: var(--principal);
+}
+
+.menu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+
+.menu a {
+    color: var(--texto);
+    text-decoration: none;
+}
+
+.menu a:hover {
+    color: var(--principal);
+}
+
+.hero {
+    padding: 90px 0;
+    background: linear-gradient(120deg, #f3f8f7, #ffffff);
+}
+
+.hero-conteudo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 48px;
+}
+
+.etiqueta {
+    color: var(--principal);
+    font-size: .76rem;
+    font-weight: 700;
+    letter-spacing: .16em;
+}
+
+h1,
+h2,
+h3 {
+    font-family: Manrope, sans-serif;
+    line-height: 1.2;
+}
+
+h1 {
+    font-size: clamp(2.4rem, 6vw, 4.4rem);
+}
+
+h2 {
+    font-size: 2.3rem;
+}
+
+.subtitulo,
+.texto {
+    max-width: 680px;
+    color: var(--texto);
+    font-size: 1.08rem;
+}
+
+.botao {
+    display: inline-block;
+    margin-top: 18px;
+    padding: 13px 22px;
+    border-radius: 8px;
+    color: white;
+    background: var(--principal);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.botao:hover {
+    background: #07565c;
+}
+
+.avatar {
+    width: min(270px, 35%);
+}
+
+.secao {
+    padding: 76px 0;
+}
+
+.fundo {
+    background: var(--fundo);
+}
+
+.grade {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.cartao {
+    padding: 24px;
+    border: 1px solid #e4eceb;
+    border-radius: 12px;
+    background: white;
+}
+
+.cartao h3 {
+    margin-top: 0;
+}
+
+.cartao p {
+    color: var(--texto);
+}
+
+.redes {
+    display: flex;
+    gap: 14px;
+    margin-top: 24px;
+}
+
+.redes a {
+    padding: 10px 18px;
+    border: 1px solid #b8d0ce;
+    border-radius: 8px;
+    color: var(--principal);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+footer {
+    padding: 22px;
+    color: #d8e6e5;
+    background: var(--escuro);
+    text-align: center;
+}
+
+@media (max-width: 720px) {
+    .navegacao,
+    .hero-conteudo {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .navegacao {
+        padding: 18px 0;
+    }
+
+    .grade {
+        grid-template-columns: 1fr;
+    }
+
+    .avatar {
+        width: 190px;
+    }
+
+    .secao {
+        padding: 56px 0;
+    }
+}
